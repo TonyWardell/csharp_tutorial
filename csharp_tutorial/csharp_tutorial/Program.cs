@@ -16,10 +16,10 @@ namespace csharp_tutorial
         public static void Main(string[] args)
         {
             int[] frequencies = CalculateFrequencies(long.MaxValue);
-            int potentialFreq = CalculateHighestPotentialFreq();
-            System.Text.StringBuilder result = PopulateResultWithFrequencies(frequencies, potentialFreq);
-            DecorateResult(result);
-            Console.WriteLine(result);
+            int greatestPotentialFrequency = CalculateHighestPotentialFreq(long.MaxValue);
+            String formattedFrequencies = FormatFrequencies(frequencies, greatestPotentialFrequency);
+            String complete = DecorateResult(formattedFrequencies);
+            Console.WriteLine(complete);
         }
 
         private static int[] CalculateFrequencies(long value)
@@ -34,38 +34,50 @@ namespace csharp_tutorial
         }
 
         //What is the highest value for frequency we could have?
-        private static int CalculateHighestPotentialFreq()
+        private static int CalculateHighestPotentialFreq(long value)
         {
-            return (Convert.ToString(long.MaxValue)).Length;
+            return (Convert.ToString(value)).Length;
         }
 
-        private static System.Text.StringBuilder PopulateResultWithFrequencies(int[] frequencies, int potentialFreq)
+        private static String FormatFrequencies(int[] frequencies, int greatestPotentialFrequency)
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            for (; potentialFreq > -1; potentialFreq--)
+            for (int testFreq = greatestPotentialFrequency; testFreq > -1; testFreq--)
             {
-                for (int number = 0; number <= INDEX_FOR_BASE10_ARRAY; number++)
+                String formattedFreqs = FormateFrequenciesForTestFrequency(frequencies, testFreq);
+                sb.Append(formattedFreqs);
+            }
+            return sb.ToString();
+        }
+
+        private static String FormateFrequenciesForTestFrequency(int[] frequencies, int testFreq)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int number = 0; number <= INDEX_FOR_BASE10_ARRAY; number++)
+            {
+                if (NumberHasFrequency(frequencies, testFreq, number))
                 {
-                    if (frequencies[number] == potentialFreq)
-                    {
-                        OutputFrequency(potentialFreq, sb, number);
-                    }
+                    String formattedFrequency = FormatFrequencyUsage(testFreq, number);
+                    sb.Append(formattedFrequency);
                 }
             }
-            return sb;
+            return sb.ToString();
         }
 
-        private static void DecorateResult(System.Text.StringBuilder sb)
+        private static bool NumberHasFrequency(int[] frequencies, int testFreq, int number)
         {
-            sb.Insert(0, "[");
-            sb.Append("]");
+            return frequencies[number] == testFreq;
         }
 
-        private static void OutputFrequency(int freq, System.Text.StringBuilder sb, int number)
+        private static String DecorateResult(String formattedFrequencies)
+        {
+            return String.Format("[{0}]", formattedFrequencies);
+        }
+
+        private static String FormatFrequencyUsage(int freq, int number)
         {
             String commaAndTrailingSpace = number != 1 ? ", " : "";
-            String numberFrequency = String.Format("{0} => {1}{2}", number, freq, commaAndTrailingSpace);
-            sb.Append(numberFrequency);
+            return String.Format("{0} => {1}{2}", number, freq, commaAndTrailingSpace);
         }
 
         private static int[] SplitInputNumberIntoArrayOfNumbers(long value)
@@ -82,3 +94,32 @@ namespace csharp_tutorial
         }
     }
 }
+
+/*
+ * This program aims to demonstrate the following good coding practicies
+ * ---------------------------------------------------------------------
+ * Methods have an abstraction at the same level
+ * 
+ * Method names are clear and show intent
+ * 
+ * Methods only do one thing - and do it well ;)
+ * 
+ * Method argument lists are short
+ * 
+ * Methods don't modify the state of arguments they receive (no side affects)
+ * 
+ * Methods are idempotent
+ * 
+ * Variable names are clear and show intent
+ * 
+ * Functionality is not spread across the code e.g. DecorateResult
+ * 
+ * Avoid Magic Numbers
+ * 
+ * This code has the following problems however
+ * --------------------------------------------
+ * 
+ * It uses statics too much
+ * 
+ * Its purely procedural, not OO
+*/
