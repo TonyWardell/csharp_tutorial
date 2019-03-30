@@ -11,43 +11,74 @@ namespace csharp_tutorial
 {
     public class Program
     {
+        private const int INDEX_FOR_BASE10_ARRAY = 9;
+
         public static void Main(string[] args)
         {
-            String inputString = Convert.ToString(long.MaxValue);
-            char[] charArray = inputString.ToCharArray();
-            int[] target = new int[10];
+            int[] frequencies = CalculateFrequencies(long.MaxValue);
+            int potentialFreq = CalculateHighestPotentialFreq();
+            System.Text.StringBuilder result = PopulateResultWithFrequencies(frequencies, potentialFreq);
+            DecorateResult(result);
+            Console.WriteLine(result);
+        }
 
-            for (int i = 0; i < charArray.Length; i++)
+        private static int[] CalculateFrequencies(long value)
+        {
+            int[] numberSequence = SplitInputNumberIntoArrayOfNumbers(value);
+            int[] frequencies = new int[10];
+            for (int i = 0; i < numberSequence.Length; i++)
             {
-                int next = Convert.ToInt32(new String(charArray[i], 1));
-                target[next]++;
+                frequencies[numberSequence[i]]++;
             }
+            return frequencies;
+        }
 
-            //What is the highest value for frequency we could have?
-            int j = (Convert.ToString(long.MaxValue)).Length;
+        //What is the highest value for frequency we could have?
+        private static int CalculateHighestPotentialFreq()
+        {
+            return (Convert.ToString(long.MaxValue)).Length;
+        }
 
-            //Build up output string
-            var sb = new System.Text.StringBuilder();
-            sb.Append("[");
-
-            //Control comma appearence
-            int valuesWritten = 10;
-
-            for (; j > -1; j--)
+        private static System.Text.StringBuilder PopulateResultWithFrequencies(int[] frequencies, int potentialFreq)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (; potentialFreq > -1; potentialFreq--)
             {
-                for (int k = 0; k <= 9; k++)
+                for (int number = 0; number <= INDEX_FOR_BASE10_ARRAY; number++)
                 {
-                    if (target[k] == j)
+                    if (frequencies[number] == potentialFreq)
                     {
-                        String comma = valuesWritten != 1? "," : "";
-                        String found = String.Format("{0} => {1}{2} ", k, j, comma);
-                        sb.Append(found);
-                        valuesWritten--;
+                        OutputFrequency(potentialFreq, sb, number);
                     }
                 }
             }
+            return sb;
+        }
+
+        private static void DecorateResult(System.Text.StringBuilder sb)
+        {
+            sb.Insert(0, "[");
             sb.Append("]");
-            System.Console.WriteLine(sb);
+        }
+
+        private static void OutputFrequency(int freq, System.Text.StringBuilder sb, int number)
+        {
+            String commaAndTrailingSpace = number != 1 ? ", " : "";
+            String numberFrequency = String.Format("{0} => {1}{2}", number, freq, commaAndTrailingSpace);
+            sb.Append(numberFrequency);
+        }
+
+        private static int[] SplitInputNumberIntoArrayOfNumbers(long value)
+        {
+            String inputString = Convert.ToString(value);
+            char[] charArray = inputString.ToCharArray();
+            int[] numberSequence = new int[charArray.Length];
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                int numberAtIndex = Convert.ToInt32(new String(charArray[i], 1));
+                numberSequence[i] = numberAtIndex;
+            }
+            return numberSequence;
         }
     }
 }
