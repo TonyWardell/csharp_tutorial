@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 // We need to create a simple routine that calculates the frequency of the digits
 // in an 8 byte number, the result needs to be sorted by the frequency.
@@ -17,8 +19,8 @@ namespace csharp_tutorial
         {
             int[] frequencies = CalculateFrequencies(long.MaxValue);
             int greatestPotentialFrequency = CalculateHighestPotentialFreq(long.MaxValue);
-            String formattedFrequencies = FormatFrequencies(frequencies, greatestPotentialFrequency);
-            String complete = DecorateResult(formattedFrequencies);
+            List<String> formattedFrequencies = CalculateNumberFrequencies(frequencies, greatestPotentialFrequency);
+            String complete = FormatResult(formattedFrequencies);
             Console.WriteLine(complete);
         }
 
@@ -39,29 +41,32 @@ namespace csharp_tutorial
             return (Convert.ToString(value)).Length;
         }
 
-        private static String FormatFrequencies(int[] frequencies, int greatestPotentialFrequency)
+        private static List<String> CalculateNumberFrequencies(int[] frequencies, int greatestPotentialFrequency)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var formattedFrequencies = new List<string>();
             for (int testFreq = greatestPotentialFrequency; testFreq > -1; testFreq--)
             {
-                String formattedFreqs = FormateFrequenciesForTestFrequency(frequencies, testFreq);
-                sb.Append(formattedFreqs);
+                List<String> numbersWithFrequency = WhichNumbersHaveTestFrequency(frequencies, testFreq);
+                formattedFrequencies.AddRange(numbersWithFrequency);
             }
-            return sb.ToString();
+            return formattedFrequencies;
         }
 
-        private static String FormateFrequenciesForTestFrequency(int[] frequencies, int testFreq)
+        //            String commaAndTrailingSpace = number != 1 ? ", " : "";
+
+
+        private static List<string> WhichNumbersHaveTestFrequency(int[] frequencies, int testFreq)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var numbersWithTestFrequency = new List<string>();
             for (int number = 0; number <= INDEX_FOR_BASE10_ARRAY; number++)
             {
                 if (NumberHasFrequency(frequencies, testFreq, number))
                 {
-                    String formattedFrequency = FormatFrequencyUsage(testFreq, number);
-                    sb.Append(formattedFrequency);
+                    String assignedFrequency = AssignFrequencyToNumber(testFreq, number);
+                    numbersWithTestFrequency.Add(assignedFrequency);
                 }
             }
-            return sb.ToString();
+            return numbersWithTestFrequency;
         }
 
         private static bool NumberHasFrequency(int[] frequencies, int testFreq, int number)
@@ -69,15 +74,9 @@ namespace csharp_tutorial
             return frequencies[number] == testFreq;
         }
 
-        private static String DecorateResult(String formattedFrequencies)
+        private static String AssignFrequencyToNumber(int freq, int number)
         {
-            return String.Format("[{0}]", formattedFrequencies);
-        }
-
-        private static String FormatFrequencyUsage(int freq, int number)
-        {
-            String commaAndTrailingSpace = number != 1 ? ", " : "";
-            return String.Format("{0} => {1}{2}", number, freq, commaAndTrailingSpace);
+            return String.Format("{0} => {1}", number, freq);
         }
 
         private static int[] SplitInputNumberIntoArrayOfNumbers(long value)
@@ -91,6 +90,25 @@ namespace csharp_tutorial
                 numberSequence[i] = numberAtIndex;
             }
             return numberSequence;
+        }
+
+        private static String FormatResult(List<String> numberFrequencies)
+        {
+            String[] ff = numberFrequencies.ToArray();
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+
+            for(int i=0; i < ff.Length; i++)
+            {
+                sb.Append(ff[i]);
+                if(i < ff.Length-1)
+                {
+                    sb.Append(", ");
+                }
+            }
+            sb.Append("]");
+            return sb.ToString();
         }
     }
 }
